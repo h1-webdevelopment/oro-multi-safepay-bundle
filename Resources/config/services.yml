@@ -1,0 +1,66 @@
+parameters:
+  h1_multi_safepay.method.identifier_prefix.multi_safepay: 'multi_safepay'
+
+services:
+  h1_multi_safepay.generator.multi_safepay_config_identifier:
+      parent: oro_integration.generator.prefixed_identifier_generator
+      public: true
+      arguments:
+          - '%h1_multi_safepay.method.identifier_prefix.multi_safepay%'
+
+  h1_multi_safepay.form.type.settings:
+      class: H1\OroMultiSafepayBundle\Form\Type\MultiSafepaySettingsType
+      tags:
+          - { name: form.type }
+
+  h1_multi_safepay.integration.channel:
+     class: H1\OroMultiSafepayBundle\Integration\MultiSafepayChannelType
+     public: true
+     tags:
+         - { name: oro_integration.channel, type: multi_safepay }
+
+  h1_multi_safepay.integration.transport:
+     class: H1\OroMultiSafepayBundle\Integration\MultiSafepayTransport
+     public: false
+     tags:
+         - { name: oro_integration.transport, type: multi_safepay, channel_type: multi_safepay }
+         
+  h1_multi_safepay.factory.multi_safepay_config:
+       class: H1\OroMultiSafepayBundle\Method\Config\Factory\MultiSafepayConfigFactory
+       public: false
+       arguments:
+           - '@oro_locale.helper.localization'
+           - '@h1_multi_safepay.generator.multi_safepay_config_identifier'
+
+  h1_multi_safepay.payment_method.config.provider:
+     class: H1\OroMultiSafepayBundle\Method\Config\Provider\MultiSafepayConfigProvider
+     arguments:
+         - '@doctrine'
+         - '@logger'
+         - '@h1_multi_safepay.factory.multi_safepay_config'
+         
+  h1_multi_safepay.factory.method_view.multi_safepay:
+    class: H1\OroMultiSafepayBundle\Method\View\Factory\MultiSafepayViewFactory
+    public: false
+    
+  h1_multi_safepay.payment_method_view_provider.multi_safepay:
+    class: H1\OroMultiSafepayBundle\Method\View\Provider\MultiSafepayViewProvider
+    public: false
+    arguments:
+       - '@h1_multi_safepay.payment_method.config.provider'
+       - '@h1_multi_safepay.factory.method_view.multi_safepay'
+    tags:
+       - { name: oro_payment.payment_method_view_provider }
+
+  h1_multi_safepay.factory.method.multi_safepay:
+     class: H1\OroMultiSafepayBundle\Method\Factory\MultiSafepayMethodFactory
+     public: false
+
+  h1_multi_safepay.payment_method_provider.multi_safepay:
+     class: H1\OroMultiSafepayBundle\Method\Provider\MultiSafepayMethodProvider
+     public: false
+     arguments:
+         - '@h1_multi_safepay.payment_method.config.provider'
+         - '@h1_multi_safepay.factory.method.multi_safepay'
+     tags:
+         - { name: oro_payment.payment_method_provider }

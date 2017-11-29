@@ -1,0 +1,30 @@
+{
+    "name": "h1/oro-multi-safepay-bundle",
+    "type": "symfony-bundle",
+    "description": "MultiSafepay Integration Bundle",
+    "homepage": "https://bitbucket.org/onestopwebshop/oro-multi-safepay-bundle",
+    "keywords": ["Oro", "Payment", "MultiSafepay"],
+    "license": "OSL-3.0",
+    "authors": [
+        {
+            "name": "H1 Webdevelopment",
+            "homepage": "http://www.h1.nl"
+        }
+    ],
+    "require": {
+        "php": ">=7.0",
+        "oro/platform": "2.4.*"
+    },
+    "autoload": {
+        "psr-4": { "H1\\OroMultiSafepayBundle\\": "" },
+        "exclude-from-classmap": ["/Tests/"]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.4.x-dev"
+        }
+    }
+}

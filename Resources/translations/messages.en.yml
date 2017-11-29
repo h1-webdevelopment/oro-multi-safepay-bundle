@@ -1,0 +1,8 @@
+h1:
+  multi_safepay:
+    settings:
+      labels.label: 'Label'
+      short_labels.label: 'Short Label'
+    channel_type.label: 'MultiSafepay'
+    payment_method_message: 'MultiSafepay'
+    test_mode.label: 'Test mode'
