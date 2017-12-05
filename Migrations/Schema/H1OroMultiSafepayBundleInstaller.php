@@ -44,11 +44,16 @@ class H1OroMultiSafepayBundleInstaller implements Installation
      * Update oro_integration_transport table
      *
      * @param Schema $schema
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     protected function updateOroIntegrationTransportTable(Schema $schema)
     {
         $table = $schema->getTable('oro_integration_transport');
         $table->addColumn('msp_test_mode', 'boolean', ['default' => '0', 'notnull' => false]);
+        $table->addColumn('msp_api_key', 'string', ['default' => '', 'notnull' => false, 'length' => 255]);
+        $table->addColumn('msp_gateway', 'string', ['default' => '', 'notnull' => false, 'length' => 255]);
+        $table->addColumn('msp_issuers', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $table->addColumn('msp_all_issuers', 'json_array', ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
         $table->setPrimaryKey(['id']);
     }
 

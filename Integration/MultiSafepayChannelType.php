@@ -6,6 +6,7 @@
  * with this source code in the file LICENSE.
  */
 namespace H1\OroMultiSafepayBundle\Integration;
+
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface;
 use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 

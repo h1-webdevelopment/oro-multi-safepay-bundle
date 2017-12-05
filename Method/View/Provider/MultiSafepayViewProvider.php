@@ -5,18 +5,16 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
-
-
 namespace H1\OroMultiSafepayBundle\Method\View\Provider;
 
-
-use Doctrine\Common\Collections\ArrayCollection;
 use H1\OroMultiSafepayBundle\Method\Config\MultiSafepayConfigInterface;
 use H1\OroMultiSafepayBundle\Method\Config\Provider\MultiSafepayConfigProviderInterface;
 use H1\OroMultiSafepayBundle\Method\View\Factory\MultiSafepayViewFactoryInterface;
 use Oro\Bundle\PaymentBundle\Method\View\AbstractPaymentMethodViewProvider;
-use Oro\Bundle\PaymentBundle\Method\View\PaymentMethodViewInterface;
 
+/**
+ * Class MultiSafepayViewProvider
+ */
 class MultiSafepayViewProvider extends AbstractPaymentMethodViewProvider
 {
     /** @var MultiSafepayViewFactoryInterface */
@@ -27,7 +25,7 @@ class MultiSafepayViewProvider extends AbstractPaymentMethodViewProvider
 
     /**
      * @param MultiSafepayConfigProviderInterface $configProvider
-     * @param MultiSafepayViewFactoryInterface $factory
+     * @param MultiSafepayViewFactoryInterface    $factory
      */
     public function __construct(
         MultiSafepayConfigProviderInterface $configProvider,

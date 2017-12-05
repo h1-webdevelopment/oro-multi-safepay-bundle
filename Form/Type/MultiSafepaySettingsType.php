@@ -8,9 +8,12 @@
 namespace H1\OroMultiSafepayBundle\Form\Type;
 
 use H1\OroMultiSafepayBundle\Entity\MultiSafepaySettings;
+use H1\OroMultiSafepayBundle\Manager\MultiSafepayManager;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -21,6 +24,11 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class MultiSafepaySettingsType extends AbstractType
 {
     const BLOCK_PREFIX = 'h1_multi_safepay_setting_type';
+
+    /**
+     * @var EventSubscriberInterface[]
+     */
+    private $eventSubscribers = [];
 
     /**
      * {@inheritdoc}
@@ -51,9 +59,21 @@ class MultiSafepaySettingsType extends AbstractType
                 CheckboxType::class,
                 [
                     'label' => 'h1.multi_safepay.settings.test_mode.label',
-                    'required' => false
+                    'required' => false,
+                ]
+            )
+            ->add(
+                'apiKey',
+                TextType::class,
+                [
+                    'label' => 'h1.multi_safepay.settings.api_key.label',
+                    'required' => true,
                 ]
             );
+
+        foreach ($this->eventSubscribers as $subscriber) {
+            $builder->addEventSubscriber($subscriber);
+        }
     }
 
     /**
@@ -72,8 +92,18 @@ class MultiSafepaySettingsType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function getBlockPrefix()
+    public function getBlockPrefix(): string
     {
         return self::BLOCK_PREFIX;
+    }
+
+    /**
+     * Add services to event subscriber of form.
+     *
+     * @param EventSubscriberInterface $subscriber
+     */
+    public function addEventSubscriber(EventSubscriberInterface $subscriber)
+    {
+        $this->eventSubscribers[] = $subscriber;
     }
 }

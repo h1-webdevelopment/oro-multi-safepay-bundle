@@ -7,7 +7,6 @@
  */
 namespace H1\OroMultiSafepayBundle\Method\Provider;
 
-
 use H1\OroMultiSafepayBundle\Method\Config\MultiSafepayConfigInterface;
 use H1\OroMultiSafepayBundle\Method\Config\Provider\MultiSafepayConfigProviderInterface;
 use H1\OroMultiSafepayBundle\Method\Factory\MultiSafepayMethodFactoryInterface;
@@ -30,7 +29,7 @@ class MultiSafepayMethodProvider extends AbstractPaymentMethodProvider
 
     /**
      * @param MultiSafepayConfigProviderInterface $configProvider
-     * @param MultiSafepayMethodFactoryInterface $factory
+     * @param MultiSafepayMethodFactoryInterface  $factory
      */
     public function __construct(
         MultiSafepayConfigProviderInterface $configProvider,

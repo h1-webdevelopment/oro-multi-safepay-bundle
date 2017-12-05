@@ -13,7 +13,8 @@
     ],
     "require": {
         "php": ">=7.0",
-        "oro/platform": "2.4.*"
+        "oro/platform": "2.4.*",
+        "multisafepay/api": "^2.0"
     },
     "autoload": {
         "psr-4": { "H1\\OroMultiSafepayBundle\\": "" },

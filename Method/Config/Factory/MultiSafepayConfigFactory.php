@@ -29,7 +29,7 @@ class MultiSafepayConfigFactory implements MultiSafepayConfigFactoryInterface
     private $identifierGenerator;
 
     /**
-     * @param LocalizationHelper $localizationHelper
+     * @param LocalizationHelper                      $localizationHelper
      * @param IntegrationIdentifierGeneratorInterface $identifierGenerator
      */
     public function __construct(
@@ -51,6 +51,12 @@ class MultiSafepayConfigFactory implements MultiSafepayConfigFactoryInterface
         $params[MultiSafepayConfig::LABEL_KEY] = $this->getLocalizedValue($settings->getLabels());
         $params[MultiSafepayConfig::SHORT_LABEL_KEY] = $this->getLocalizedValue($settings->getShortLabels());
         $params[MultiSafepayConfig::ADMIN_LABEL_KEY] = $channel->getName();
+        $params[MultiSafepayConfig::GATEWAY_KEY] = $settings->getGateway();
+        $params[MultiSafepayConfig::API_KEY] = $settings->getApiKey();
+        $params[MultiSafepayConfig::API_URL] = $settings->getApiUrl();
+        $params[MultiSafepayConfig::ISSUERS_KEY] = $settings->getIssuers();
+        $params[MultiSafepayConfig::ALL_ISSUERS] = $settings->getAllIssuers();
+
         $params[MultiSafepayConfig::PAYMENT_METHOD_IDENTIFIER_KEY] =
             $this->identifierGenerator->generateIdentifier($channel);
 
@@ -64,6 +70,6 @@ class MultiSafepayConfigFactory implements MultiSafepayConfigFactoryInterface
      */
     private function getLocalizedValue(Collection $values)
     {
-        return (string)$this->localizationHelper->getLocalizedValue($values);
+        return (string) $this->localizationHelper->getLocalizedValue($values);
     }
 }

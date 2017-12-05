@@ -1,9 +1,18 @@
 {% block _payment_methods_multi_safepay_widget %}
-    <div class="{{ class_prefix }}-form__payment-methods">
-        <table class="grid">
-            <tr>
-                <td>{{ 'h1.multi_safepay.payment_method_message'|trans }}</td>
-            </tr>
-        </table>
-    </div>
+    {% set h1_msp_container = name ~ '--container' %}
+
+   <div id="{{ h1_msp_container }}">
+       {{
+           form_widget(
+               view.options.formView,
+               {
+                   container: h1_msp_container,
+                   class_prefix: class_prefix,
+                   options: view.options,
+                   paymentMethod: name,
+               }
+           )
+       }}
+   </div>
+
 {% endblock %}

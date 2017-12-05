@@ -1,0 +1,3 @@
+config:
+    paths:
+        'h1oromultisafepay/js/app/components/multi-safe-pay-checkout-component': 'bundles/h1oromultisafepay/js/app/components/multi-safe-pay-checkout-component.js'

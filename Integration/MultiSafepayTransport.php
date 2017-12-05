@@ -5,8 +5,6 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
-
-
 namespace H1\OroMultiSafepayBundle\Integration;
 
 use H1\OroMultiSafepayBundle\Entity\MultiSafepaySettings;
@@ -14,7 +12,9 @@ use H1\OroMultiSafepayBundle\Form\Type\MultiSafepaySettingsType;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
-
+/**
+ * Class MultiSafepayTransport
+ */
 class MultiSafepayTransport implements TransportInterface
 {
 

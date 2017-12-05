@@ -9,6 +9,9 @@ namespace H1\OroMultiSafepayBundle\Method\Config\Provider;
 
 use H1\OroMultiSafepayBundle\Method\Config\Factory\MultiSafepayConfigFactoryInterface;
 
+/**
+ * Interface MultiSafepayConfigProviderInterface
+ */
 interface MultiSafepayConfigProviderInterface
 {
     /**

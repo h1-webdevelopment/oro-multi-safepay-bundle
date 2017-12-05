@@ -1,5 +1,11 @@
 <?php
-
+/*
+ * (c) H1 Webdevelopment <contact@h1.nl>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+//@codingStandardsIgnoreFile
 namespace H1\OroMultiSafepayBundle\Tests\Unit\Method\Config\Factory;
 
 use Doctrine\Common\Collections\Collection;
@@ -44,8 +50,7 @@ class MultiSafepayConfigFactoryTest extends \PHPUnit_Framework_TestCase
         $channelName = 'someChannelName';
         $label = 'someLabel';
         $paymentMethodId = 'paymentMethodId';
-        $payTo = 'payTo';
-        $sendTo = 'sendTo';
+        $issuerId = 'issuerId';
 
         $paymentSettingsMock = $this->createMultiSafepaySettingsMock();
         $channelMock = $this->createChannelMock();
@@ -96,6 +101,7 @@ class MultiSafepayConfigFactoryTest extends \PHPUnit_Framework_TestCase
                 MultiSafepayConfig::LABEL_KEY => $label,
                 MultiSafepayConfig::SHORT_LABEL_KEY => $label,
                 MultiSafepayConfig::PAYMENT_METHOD_IDENTIFIER_KEY => $paymentMethodId,
+                MultiSafepayConfig::ISSUER_IDENTIFIER_KEY => $issuerId,
             ]
         );
 

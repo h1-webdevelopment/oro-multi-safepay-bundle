@@ -40,8 +40,8 @@ class MultiSafepayConfigProvider implements MultiSafepayConfigProviderInterface
     protected $logger;
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param LoggerInterface $logger
+     * @param ManagerRegistry                     $doctrine
+     * @param LoggerInterface                     $logger
      * @param MultiSafepayConfigProviderInterface $configFactory
      */
     public function __construct(
@@ -65,7 +65,6 @@ class MultiSafepayConfigProvider implements MultiSafepayConfigProviderInterface
 
         foreach ($settings as $setting) {
             $config = $this->configFactory->create($setting);
-
             $configs[$config->getPaymentMethodIdentifier()] = $config;
         }
 

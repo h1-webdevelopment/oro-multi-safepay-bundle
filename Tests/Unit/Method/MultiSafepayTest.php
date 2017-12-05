@@ -1,5 +1,11 @@
 <?php
-
+/*
+ * (c) H1 Webdevelopment <contact@h1.nl>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+//@codingStandardsIgnoreFile
 namespace H1\OroMultiSafepayBundle\Tests\Unit\Method;
 
 use H1\OroMultiSafepayBundle\DependencyInjection\H1OroMultiSafepayExtension;
@@ -47,7 +53,7 @@ class MultiSafepayTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param bool $expected
+     * @param bool   $expected
      * @param string $actionName
      *
      * @dataProvider supportsDataProvider

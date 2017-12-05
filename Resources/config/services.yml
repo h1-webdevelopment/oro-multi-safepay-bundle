@@ -12,6 +12,7 @@ services:
       class: H1\OroMultiSafepayBundle\Form\Type\MultiSafepaySettingsType
       tags:
           - { name: form.type }
+      arguments: ['@h1_multi_safepay.manager']
 
   h1_multi_safepay.integration.channel:
      class: H1\OroMultiSafepayBundle\Integration\MultiSafepayChannelType
@@ -42,6 +43,7 @@ services:
   h1_multi_safepay.factory.method_view.multi_safepay:
     class: H1\OroMultiSafepayBundle\Method\View\Factory\MultiSafepayViewFactory
     public: false
+    arguments: ['@form.factory']
     
   h1_multi_safepay.payment_method_view_provider.multi_safepay:
     class: H1\OroMultiSafepayBundle\Method\View\Provider\MultiSafepayViewProvider
@@ -55,6 +57,7 @@ services:
   h1_multi_safepay.factory.method.multi_safepay:
      class: H1\OroMultiSafepayBundle\Method\Factory\MultiSafepayMethodFactory
      public: false
+     arguments: ['@h1_multi_safepay.manager', '@router']
 
   h1_multi_safepay.payment_method_provider.multi_safepay:
      class: H1\OroMultiSafepayBundle\Method\Provider\MultiSafepayMethodProvider
@@ -64,3 +67,12 @@ services:
          - '@h1_multi_safepay.factory.method.multi_safepay'
      tags:
          - { name: oro_payment.payment_method_provider }
+
+  h1_multi_safepay.bridge.default:
+    class: H1\OroMultiSafepayBundle\Bridge\MultiSafepayApiBridge
+    arguments: [null] # Replaced in SetupMultiSafepayBridgeCompilerPass compiler pass
+
+  h1_multi_safepay.manager:
+    class: H1\OroMultiSafepayBundle\Manager\MultiSafepayManager
+    arguments: ['@h1_multi_safepay.bridge.default']
+

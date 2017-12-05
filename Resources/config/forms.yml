@@ -1,0 +1,11 @@
+services:
+  h1_multi_safepay.form.subscriber.gateways:
+    class: H1\OroMultiSafepayBundle\Form\EventSubscribers\GatewayEventSubscriber
+    tags:
+      - { name: h1_multi_safepay_form_event_listener, type: multi_safepay }
+    arguments: ['@h1_multi_safepay.manager']
+  h1_multi_safepay.form.subscriber.issuers:
+    class: H1\OroMultiSafepayBundle\Form\EventSubscribers\IssuersEventSubscriber
+    tags:
+      - { name: h1_multi_safepay_form_event_listener, type: multi_safepay }
+    arguments: ['@h1_multi_safepay.manager']

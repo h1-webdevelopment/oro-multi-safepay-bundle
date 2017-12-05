@@ -1,5 +1,11 @@
 <?php
-
+/*
+ * (c) H1 Webdevelopment <contact@h1.nl>
+ *
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
+ */
+//@codingStandardsIgnoreFile
 namespace H1\OroMultiSafepayBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\LocaleBundle\Entity\LocalizedFallbackValue;
@@ -14,19 +20,25 @@ class MultiSafepaySettingsTest extends \PHPUnit_Framework_TestCase
     {
         static::assertPropertyCollections(new MultiSafepaySettings(), [
             ['labels', new LocalizedFallbackValue()],
-            ['shortLabels', new LocalizedFallbackValue()],
+            ['shortLabels', new LocalizedFallbackValue()]
+        ]);
+
+        static::assertPropertyAccessors(new MultiSafepaySettings(), [
+            ['apiKey', 'testApi'],
+            ['testMode', true],
+            ['gateway', 'IDEAL'],
         ]);
     }
 
-    /*public function testGetSettingsBagReturnsCorrectObject()
+    public function testGetSettingsBagReturnsCorrectObject()
     {
-        $label = (new LocalizedFallbackValue())->setString('Money Order');
+        $label = (new LocalizedFallbackValue())->setString('MultiSafepay');
 
         $entity = new MultiSafepaySettings();
         $entity->addLabel($label);
 
         $settings = $entity->getSettingsBag();
 
-        static::assertEquals([$label], $settings->get('labels'));
-    }*/
+        static::assertEquals([$label], $settings->get('labels')->toArray());
+    }
 }
