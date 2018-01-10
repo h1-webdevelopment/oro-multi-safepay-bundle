@@ -44,6 +44,62 @@ class MultiSafepayView implements PaymentMethodViewInterface
      */
     public function getOptions(PaymentContextInterface $context)
     {
+        $formView = null;
+        if (\count($this->config->getIssuers())) {
+            $formView = $this->createIssuerChoiceField();
+        }
+
+        return [
+            'formView' => $formView,
+            'paymentMethod' => $this->config->getPaymentMethodIdentifier(),
+            'gateway' => $this->config->getGateway()
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBlock()
+    {
+        return '_payment_methods_multi_safepay_widget';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabel(): string
+    {
+        return $this->config->getLabel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShortLabel(): string
+    {
+        return $this->config->getShortLabel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAdminLabel(): string
+    {
+        return $this->config->getAdminLabel();
+    }
+
+    /** {@inheritdoc} */
+    public function getPaymentMethodIdentifier(): string
+    {
+        return $this->config->getPaymentMethodIdentifier();
+    }
+
+    /**
+     * @return \Symfony\Component\Form\FormView
+     */
+    protected function createIssuerChoiceField(): \Symfony\Component\Form\FormView
+    {
+        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         $formView = $this->formFactory->createNamed(
             'h1_multi_safepay_issuers',
             ChoiceType::class,
@@ -60,44 +116,6 @@ class MultiSafepayView implements PaymentMethodViewInterface
         )
         ->createView();
 
-        return ['formView' => $formView, 'paymentMethod' => $this->config->getPaymentMethodIdentifier()];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getBlock()
-    {
-        return '_payment_methods_multi_safepay_widget';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLabel()
-    {
-        return $this->config->getLabel();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getShortLabel()
-    {
-        return $this->config->getShortLabel();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAdminLabel()
-    {
-        return $this->config->getAdminLabel();
-    }
-
-    /** {@inheritdoc} */
-    public function getPaymentMethodIdentifier()
-    {
-        return $this->config->getPaymentMethodIdentifier();
+        return $formView;
     }
 }

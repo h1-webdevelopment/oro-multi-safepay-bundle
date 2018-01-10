@@ -33,6 +33,7 @@ class IssuersEventSubscriber implements EventSubscriberInterface
     {
         $this->multiSafepayManager = $multiSafepayManager;
     }
+    
 
     /**
      * @param FormEvent $formEvent
@@ -43,7 +44,7 @@ class IssuersEventSubscriber implements EventSubscriberInterface
         /** @var MultiSafepaySettings $settings */
         $settings = $formEvent->getData();
 
-        if ('' === $settings->getApiKey() || $settings->getGateway() !== 'IDEAL') {
+        if (null === $settings || '' === $settings->getApiKey() || $settings->getGateway() !== 'IDEAL') {
             return;
         }
 

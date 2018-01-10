@@ -105,4 +105,12 @@ class MultiSafepayConfig extends ParameterBag implements MultiSafepayConfigInter
     {
         return (array) $this->get(self::ALL_ISSUERS);
     }
+
+    /**
+     * @return string
+     */
+    public function getGateway(): string
+    {
+        return (string) $this->get(self::GATEWAY_KEY);
+    }
 }

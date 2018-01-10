@@ -42,7 +42,7 @@ class GatewayEventSubscriber implements EventSubscriberInterface
         /** @var MultiSafepaySettings $settings */
         $settings = $formEvent->getData();
 
-        if ('' === $settings->getApiKey()) {
+        if (null === $settings || '' === $settings->getApiKey()) {
             return;
         }
 

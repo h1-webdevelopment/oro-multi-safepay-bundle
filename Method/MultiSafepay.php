@@ -21,7 +21,63 @@ use Symfony\Component\Routing\RouterInterface;
  */
 class MultiSafepay implements PaymentMethodInterface
 {
+    /**
+     * Payment has been successfully completed.
+     *
+     * This event is called by the EventListener\Callback\MultiSafePayCheckoutListener
+     * as soon as the payment has been processed successfully
+     */
     const COMPLETE = 'complete';
+
+    /**
+     * A payment link has been generated, but no payment has been received yet.
+     */
+    const INITIALIZED = 'initialized';
+
+    /**
+     * Rejected by the credit card company.
+     */
+    const DECLINED = 'declined';
+
+    /**
+     * Canceled by the merchant (only applies to the status Initialised or Uncleared).
+     */
+    const CANCELED = 'canceled';
+
+    /**
+     * Depending on the payment method unfinished transactions automatically expire after a predefined period.
+     */
+    const EXPIRED = 'expired';
+
+    /**
+     * Waiting for manual permission of the merchant to approve/disapprove the payment.
+     */
+    const UNCLEARED = 'uncleared';
+
+    /**
+     * Payment has been refunded to the customer.
+     */
+    const REFUNDED = 'refunded';
+
+    /**
+     * The payment has been partially refunded to the customer.
+     */
+    const PARTIAL_REFUNDED = 'partial_refunded';
+
+    /**
+     * Payout/refund has been temporary put on reserved, a temporary status, till the e-wallet has
+     */
+    const RESERVED = 'reserved';
+
+    /**
+     * Failed payment.
+     */
+    const VOID = 'void';
+
+    /**
+     * Forced reversal of funds initiated by consumer’s issuing bank. Only applicable to direct debit and credit card payments.
+     */
+    const CHARGEDBACK = 'chargedback';
 
     /**
      * @var MultiSafepayConfigInterface
@@ -40,8 +96,8 @@ class MultiSafepay implements PaymentMethodInterface
 
     /**
      * @param MultiSafepayConfigInterface $config
-     * @param MultiSafepayManager         $multiSafepayManager
-     * @param RouterInterface             $router
+     * @param MultiSafepayManager $multiSafepayManager
+     * @param RouterInterface $router
      */
     public function __construct(MultiSafepayConfigInterface $config, MultiSafepayManager $multiSafepayManager, RouterInterface $router)
     {
@@ -62,74 +118,37 @@ class MultiSafepay implements PaymentMethodInterface
      * @param PaymentTransaction $paymentTransaction
      * @return array
      */
-    public function purchase(PaymentTransaction $paymentTransaction)
+    public function purchase(PaymentTransaction $paymentTransaction): array
     {
         $additionalData = json_decode($paymentTransaction->getTransactionOptions()['additionalData'], true);
 
-        $cancelUrl = $this->router->generate(
-            'oro_payment_callback_error',
-            [
-                'accessIdentifier' => $paymentTransaction->getAccessIdentifier(),
-            ],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-
-        $returnURL = $this->router->generate(
-            'oro_payment_callback_return',
-            [
-                'accessIdentifier' => $paymentTransaction->getAccessIdentifier(),
-            ],
-            UrlGeneratorInterface::ABSOLUTE_URL
-        );
-
+        $urlEndpoints = $this->getUrlEndPoints($paymentTransaction);
 
         $order = [
-            'type' => 'direct',
+            'type' => $this->getPaymentType($paymentTransaction, $additionalData),
             'order_id' => $paymentTransaction->getAccessIdentifier(), //TODO: this is incorrect
-            'currency' => 'EUR',
-            'amount' => 1000,
-            'description' => 'Demo Transaction',
-            'items' => 'items list',
-            'manual' => 'false',
-            'gateway' => 'IDEAL',
-            'days_active' => '30',
+            'currency' => $paymentTransaction->getCurrency(),
+            'amount' => $paymentTransaction->getAmount() * 100,
+            'gateway' => $additionalData['gateway'],
+            'description' => 'Payment',
             'payment_options' => [
-                'notification_url' => BASE_URL.'notificationController.php?type=initial',
-                'redirect_url' => $returnURL,
-                'cancel_url' => $cancelUrl,
+                'notification_url' => $urlEndpoints['notifyUrl'],
+                'redirect_url' => $urlEndpoints['returnUrl'],
+                'cancel_url' => $urlEndpoints['cancelUrl'],
                 'close_window' => 'true',
-            ],
-            'customer' => [
-                'locale' => 'nl_NL',
-                'ip_address' => '127.0.0.1',
-                'forwarded_ip' => '127.0.0.1',
-                'first_name' => 'Jan',
-                'last_name' => 'Modaal',
-                'address1' => 'Kraanspoor',
-                'address2' => '',
-                'house_number' => '39',
-                'zip_code' => '1032 SC',
-                'city' => 'Amsterdam',
-                'state' => '',
-                'country' => 'NL',
-                'phone' => '0208500500',
-                'email' => 'test@test.nl',
-            ],
-            'gateway_info' => [
-                'issuer_id' => $additionalData['msp_issuer'],
-            ],
-            'plugin' => [
-                'shop' => 'MultiSafepay Toolkit',
-                'shop_version' => TOOLKIT_VERSION,
-                'plugin_version' => TOOLKIT_VERSION,
-                'partner' => 'MultiSafepay',
-                'shop_root_url' => 'http://www.demo.nl',
             ],
         ];
 
+        if (array_key_exists('msp_issuer', $additionalData)) {
+            $order['gateway_info'] = [
+                'issuer_id' => $additionalData['msp_issuer'],
+            ];
+        }
+
+        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
         $res = $this->multiSafepayManager->configureByConfig($this->config)
-        ->getClient()
-        ->postOrders($order);
+            ->getClient()
+            ->postOrders($order);
 
         return [
             // @codingStandardsIgnoreLine Zend.NamingConventions.ValidVariableName.NotCamelCaps
@@ -138,36 +157,30 @@ class MultiSafepay implements PaymentMethodInterface
     }
 
     /**
-     * {@inheritdoc}
+     * This event is called by the EventListener\Callback\MultiSafePayCheckoutListener
+     * as soon as the payment has been processed successfully
+     * @throws \LogicException
      */
     public function complete(PaymentTransaction $paymentTransaction)
     {
-        dump($paymentTransaction);
-        exit;
+        $response = $this->multiSafepayManager
+            ->configureByConfig($this->config)
+            ->getClient()
+            ->getOrder($paymentTransaction->getResponse()['transactionid']);
+
+        if ($response->status === 'completed') {
+            $paymentTransaction
+                ->setSuccessful(true)
+                ->setActive(false)
+                ->setResponse((array)$response)
+                ->setReference($paymentTransaction->getResponse()['transactionid']);
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function capture()
-    {
-        dump("capturee");
-        exit;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function charge()
-    {
-        dump("charge");
-        exit;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIdentifier()
+    public function getIdentifier(): string
     {
         return $this->config->getPaymentMethodIdentifier();
     }
@@ -175,7 +188,7 @@ class MultiSafepay implements PaymentMethodInterface
     /**
      * {@inheritdoc}
      */
-    public function isApplicable(PaymentContextInterface $context)
+    public function isApplicable(PaymentContextInterface $context): bool
     {
         return true;
     }
@@ -186,12 +199,70 @@ class MultiSafepay implements PaymentMethodInterface
      *
      * {@inheritdoc}
      */
-    public function supports($actionName)
+    public function supports($actionName): bool
     {
         return \in_array(
             $actionName,
-            [self::PURCHASE, self::CHARGE, self::CAPTURE, self::COMPLETE],
+            [self::PURCHASE, self::COMPLETE],
             true
         );
+    }
+
+
+    /**
+     * Generates cancel/return and notify URLs.
+     *
+     * @param PaymentTransaction $paymentTransaction
+     *
+     * @return array
+     */
+    protected function getUrlEndPoints(PaymentTransaction $paymentTransaction): array
+    {
+
+        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
+        return [
+            'cancelUrl' => $this->router->generate(
+                'oro_payment_callback_error',
+                [
+                    'accessIdentifier' => $paymentTransaction->getAccessIdentifier(),
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+            'returnUrl' => $this->router->generate(
+                'oro_payment_callback_return',
+                [
+                    'accessIdentifier' => $paymentTransaction->getAccessIdentifier(),
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+
+            'notifyUrl' => $this->router->generate(
+                'oro_payment_callback_notify',
+                [
+                    'accessIdentifier' => $paymentTransaction->getAccessIdentifier(),
+                    'accessToken' => $paymentTransaction->getAccessToken()
+                ],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            ),
+        ];
+    }
+
+    /**
+     * Return either redirect or direct as payment type
+     *
+     * @See: https://www.multisafepay.com/documentation/doc/API-Reference/#API-Reference-Createanorder
+     *
+     * @param PaymentTransaction $paymentTransaction
+     * @param array $additionalData
+     *
+     * @return string
+     */
+    private function getPaymentType(PaymentTransaction $paymentTransaction, array $additionalData): string
+    {
+        if (!array_key_exists('msp_issuer', $additionalData)) {
+            return 'redirect';
+        }
+
+        return 'direct';
     }
 }

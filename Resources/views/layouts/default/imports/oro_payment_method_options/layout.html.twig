@@ -1,18 +1,25 @@
 {% block _payment_methods_multi_safepay_widget %}
     {% set h1_msp_container = name ~ '--container' %}
 
-   <div id="{{ h1_msp_container }}">
-       {{
-           form_widget(
-               view.options.formView,
-               {
-                   container: h1_msp_container,
-                   class_prefix: class_prefix,
-                   options: view.options,
-                   paymentMethod: name,
-               }
-           )
-       }}
-   </div>
+    <div class="hidden"
+         data-page-component-module="h1oromultisafepay/js/app/components/multi-safe-pay-checkout-component"
+         data-page-component-options="{{ {paymentMethod: view.options.paymentMethod, gateway: view.options.gateway, selectors: { container: '#'~h1_msp_container }  }|json_encode }}">
+    </div>
 
+
+    {% if view.options.formView %}
+        <div id="{{ h1_msp_container }}">
+            {{
+               form_widget(
+                   view.options.formView,
+                   {
+                       container: h1_msp_container,
+                       class_prefix: class_prefix,
+                       options: view.options,
+                       paymentMethod: name
+                   }
+               )
+            }}
+        </div>
+    {% endif %}
 {% endblock %}

@@ -1,9 +1,4 @@
 {% block _h1_multi_safepay_issuers_widget %}
-    <div class="hidden"
-         data-page-component-module="h1oromultisafepay/js/app/components/multi-safe-pay-checkout-component"
-         data-page-component-options="{{ {paymentMethod: options.paymentMethod, selectors: { fieldIssuers: '#'~id, container: '#'~container }  }|json_encode }}">
-    </div>
-
     <div class="{{ options.paymentMethod }}--additional_fields">
         {{ block('choice_widget') }}
     </div>

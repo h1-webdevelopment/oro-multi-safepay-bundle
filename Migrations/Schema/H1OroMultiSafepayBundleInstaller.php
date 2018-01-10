@@ -54,7 +54,6 @@ class H1OroMultiSafepayBundleInstaller implements Installation
         $table->addColumn('msp_gateway', 'string', ['default' => '', 'notnull' => false, 'length' => 255]);
         $table->addColumn('msp_issuers', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
         $table->addColumn('msp_all_issuers', 'json_array', ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
-        $table->setPrimaryKey(['id']);
     }
 
     /**

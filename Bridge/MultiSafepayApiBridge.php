@@ -76,4 +76,19 @@ class MultiSafepayApiBridge implements MultiSafepayApiClientBridgeInterface
 
         return $result;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOrder(string $transactionId)
+    {
+        try {
+            $result = $this->client->orders->get('orders', $transactionId);
+        } catch (\Exception $e) {
+            dump($e);
+            exit;
+        }
+
+        return $result;
+    }
 }

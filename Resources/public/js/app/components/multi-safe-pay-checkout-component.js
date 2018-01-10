@@ -11,10 +11,10 @@ define(function(require) {
          * @property {Object}
          */
         options: {
+            gateway: null,
             paymentMethod: null,
             selectors: {
                 container: '',
-                fieldIssuers: ''
             }
         },
 
@@ -29,23 +29,28 @@ define(function(require) {
             mediator.on('checkout:place-order:response', this.handleSubmit, this);
             mediator.on('checkout:payment:before-form-serialization', this.beforeTransit, this);
 
-            this.$el = this.options._sourceElement.closest(this.options.selectors.container).first();
+            this.$el = this.options._sourceElement.parent().find(this.options.selectors.container).first();
         },
 
         /**
          * @param {Object} eventData
          */
         beforeTransit: function(eventData) {
-            console.log(this.getIssuersField().val());
-            console.log(this.options.paymentMethod);
-
-            if (eventData.paymentMethod === this.options.paymentMethod) {
-                mediator.trigger('checkout:payment:additional-data:set', JSON.stringify({'msp_issuer': this.getIssuersField().val()}));
+             if (eventData.paymentMethod === this.options.paymentMethod) {
+                mediator.trigger(
+                    'checkout:payment:additional-data:set',
+                    JSON.stringify(
+                        {
+                            'msp_issuer': this.getIssuersField().val(),
+                            'gateway': this.options.gateway
+                        }
+                    )
+                );
             }
         },
 
         getIssuersField: function () {
-            return this.$el.find(this.options.selectors.fieldIssuers);
+            return this.$el.find('select[name=h1_multi_safepay_issuers]');
         },
 
         /**

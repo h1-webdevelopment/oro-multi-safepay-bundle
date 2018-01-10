@@ -57,4 +57,12 @@ interface MultiSafepayApiClientBridgeInterface
      * @return object
      */
     public function postOrders(array $orders);
+
+    /**
+     * Find/Get an order by its transactionId
+     *
+     * @param string $transactionId
+     * @return object
+     */
+    public function getOrder(string $transactionId);
 }
