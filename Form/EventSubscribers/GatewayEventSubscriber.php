@@ -5,14 +5,21 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
 namespace H1\OroMultiSafepayBundle\Form\EventSubscribers;
 
 use H1\OroMultiSafepayBundle\Entity\MultiSafepaySettings;
 use H1\OroMultiSafepayBundle\Manager\MultiSafepayManager;
+use OutOfBoundsException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\Exception\AlreadySubmittedException;
+use Symfony\Component\Form\Exception\LogicException;
+use Symfony\Component\Form\Exception\UnexpectedTypeException;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
  * Class GatewayEventListener
@@ -36,6 +43,10 @@ class GatewayEventSubscriber implements EventSubscriberInterface
     /**
      * @param FormEvent $formEvent
      * @return void
+     * @throws UnexpectedTypeException
+     * @throws LogicException
+     * @throws AlreadySubmittedException
+     * @throws OutOfBoundsException
      */
     public function preSetData(FormEvent $formEvent)
     {
@@ -46,16 +57,27 @@ class GatewayEventSubscriber implements EventSubscriberInterface
             return;
         }
 
-        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-        $formEvent
-            ->getForm()
-            ->add(
-                'gateway',
-                ChoiceType::class,
-                [
-                    'choices' =>  $this->getGatewayChoices($settings),
-                ]
-            );
+        try {
+            $gatewayChoices = $this->getGatewayChoices($settings);
+            $gatewayError = false;
+        } catch (BadRequestHttpException $e) {
+            $gatewayChoices = [];
+            $gatewayError = $e->getMessage();
+        }
+
+        $form = $formEvent->getForm();
+        $form->add(
+            'gateway',
+            ChoiceType::class,
+            [
+                'choices' => $gatewayChoices,
+            ]
+        );
+
+        if ($gatewayError && !$form->isSubmitted()) {
+            $form->get('gateway')
+                ->addError(new FormError($gatewayError));
+        }
     }
 
     /**
@@ -79,8 +101,7 @@ class GatewayEventSubscriber implements EventSubscriberInterface
                 ->getClient()
                 ->getGateways();
         } catch (\Exception $e) {
-            // TODO: Show exception to client
-            return [];
+            throw new BadRequestHttpException($e->getMessage());
         }
 
         return array_combine(

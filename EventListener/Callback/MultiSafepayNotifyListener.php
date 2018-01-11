@@ -5,8 +5,10 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
 namespace H1\OroMultiSafepayBundle\EventListener\Callback;
 
+use H1\OroMultiSafepayBundle\Method\MultiSafepay;
 use Monolog\Logger;
 use Oro\Bundle\PaymentBundle\Event\AbstractCallbackEvent;
 use Oro\Bundle\PaymentBundle\Method\Provider\PaymentMethodProviderInterface;
@@ -40,6 +42,7 @@ class MultiSafepayNotifyListener
         $this->session = $session;
         $this->paymentMethodProvider = $paymentMethodProvider;
     }
+
     /**
      * @param AbstractCallbackEvent $event
      */
@@ -62,11 +65,20 @@ class MultiSafepayNotifyListener
             return;
         }
 
+        /** @var MultiSafepay $multiSavepay */
+        $multiSavepay = $this->paymentMethodProvider->getPaymentMethod($paymentTransaction->getPaymentMethod());
+        $multiSavepayOrder = $multiSavepay->execute('updateOrderStatus', $paymentTransaction);
         $event->markSuccessful();
-        $this->logger->addInfo('Payment successfully marked completed');
 
-//        print_r($event);
-////        dump($paymentTransaction); exit;
+        if (array_key_exists('status', $multiSavepayOrder)) {
+            $this->logger->addInfo(
+                sprintf('Payment notified, payment transaction id %s, status %s',
+                    $paymentTransaction->getId(),
+                    $multiSavepayOrder['status']
+                ));
+        } else {
+            $this->logger->addInfo('Payment successfully marked completed');
+        }
     }
 
     public function setLogger(Logger $logger)
