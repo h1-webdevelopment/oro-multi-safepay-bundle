@@ -220,7 +220,7 @@ class MultiSafepaySettings extends Transport
     /**
      * @param bool $testMode
      */
-    public function setTestMode($testMode)
+    public function setTestMode(bool $testMode)
     {
         $this->testMode = $testMode;
     }
