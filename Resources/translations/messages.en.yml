@@ -3,6 +3,7 @@ h1:
     settings:
       labels.label: 'Label'
       short_labels.label: 'Short Label'
+      test_mode.label: 'Test mode'
+      api_key.label: 'Api key'
     channel_type.label: 'MultiSafepay'
     payment_method_message: 'MultiSafepay'
-    test_mode.label: 'Test mode'

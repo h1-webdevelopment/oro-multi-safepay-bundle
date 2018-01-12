@@ -10,6 +10,7 @@ namespace H1\OroMultiSafepayBundle\Method;
 
 use H1\OroMultiSafepayBundle\Manager\MultiSafepayManager;
 use H1\OroMultiSafepayBundle\Method\Config\MultiSafepayConfigInterface;
+use LogicException;
 use Oro\Bundle\PaymentBundle\Context\PaymentContextInterface;
 use Oro\Bundle\PaymentBundle\Entity\PaymentTransaction;
 use Oro\Bundle\PaymentBundle\Method\PaymentMethodInterface;
@@ -126,7 +127,7 @@ class MultiSafepay implements PaymentMethodInterface
 
         $order = [
             'type' => $this->getPaymentType($paymentTransaction, $additionalData),
-            'order_id' => $paymentTransaction->getAccessIdentifier(), //TODO: this is incorrect
+            'order_id' => $paymentTransaction->getAccessIdentifier(),
             'currency' => $paymentTransaction->getCurrency(),
             'amount' => $paymentTransaction->getAmount() * 100,
             'gateway' => $additionalData['gateway'],
@@ -159,7 +160,8 @@ class MultiSafepay implements PaymentMethodInterface
     /**
      * This event is called by the EventListener\Callback\MultiSafePayCheckoutListener
      * as soon as the payment has been processed successfully
-     * @throws \LogicException
+     * @param PaymentTransaction $paymentTransaction
+     * @throws LogicException
      */
     public function complete(PaymentTransaction $paymentTransaction)
     {
@@ -168,13 +170,42 @@ class MultiSafepay implements PaymentMethodInterface
             ->getClient()
             ->getOrder($paymentTransaction->getResponse()['transactionid']);
 
-        if ($response->status === 'completed') {
+        if ($response->status === self::COMPLETE) {
             $paymentTransaction
                 ->setSuccessful(true)
                 ->setActive(false)
                 ->setResponse((array)$response)
                 ->setReference($paymentTransaction->getResponse()['transactionid']);
         }
+    }
+
+    /**
+     * @param PaymentTransaction $paymentTransaction
+     * @return array
+     * @throws LogicException
+     */
+    public function updateOrderStatus(PaymentTransaction $paymentTransaction)
+    {
+        $response = $this->multiSafepayManager
+            ->configureByConfig($this->config)
+            ->getClient()
+            ->getOrder($paymentTransaction->getAccessIdentifier());
+
+        if ($response->status === self::COMPLETE) {
+            $paymentTransaction
+                ->setSuccessful(true)
+                ->setActive(false)
+                ->setResponse((array)$response);
+//        } else {
+//            #todo what if an order is payed and later an order is declined or something. Do we change the status of the payment again?
+//            $paymentTransaction
+//                ->setSuccessful(true)
+//                ->setActive(false)
+//                ->setResponse((array)$response);
+        }
+
+
+        return (array)$response;
     }
 
     /**

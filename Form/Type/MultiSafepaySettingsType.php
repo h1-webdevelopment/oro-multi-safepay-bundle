@@ -8,7 +8,6 @@
 namespace H1\OroMultiSafepayBundle\Form\Type;
 
 use H1\OroMultiSafepayBundle\Entity\MultiSafepaySettings;
-use H1\OroMultiSafepayBundle\Manager\MultiSafepayManager;
 use Oro\Bundle\LocaleBundle\Form\Type\LocalizedFallbackValueCollectionType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\AbstractType;
