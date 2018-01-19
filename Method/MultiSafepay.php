@@ -170,7 +170,7 @@ class MultiSafepay implements PaymentMethodInterface
             ->getClient()
             ->getOrder($paymentTransaction->getResponse()['transactionid']);
 
-        if ($response->status === self::COMPLETE) {
+        if ($response->status === 'completed') {
             $paymentTransaction
                 ->setSuccessful(true)
                 ->setActive(false)
@@ -191,7 +191,7 @@ class MultiSafepay implements PaymentMethodInterface
             ->getClient()
             ->getOrder($paymentTransaction->getAccessIdentifier());
 
-        if ($response->status === self::COMPLETE) {
+        if ($response->status === 'completed') {
             $paymentTransaction
                 ->setSuccessful(true)
                 ->setActive(false)
