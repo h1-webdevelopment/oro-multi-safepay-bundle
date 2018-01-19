@@ -10,6 +10,7 @@ namespace H1\OroMultiSafepayBundle\Method\Factory;
 use H1\OroMultiSafepayBundle\Manager\MultiSafepayManager;
 use H1\OroMultiSafepayBundle\Method\Config\MultiSafepayConfigInterface;
 use H1\OroMultiSafepayBundle\Method\MultiSafepay;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Symfony\Component\Routing\RouterInterface;
 
 /**
@@ -25,16 +26,22 @@ class MultiSafepayMethodFactory implements MultiSafepayMethodFactoryInterface
      * @var RouterInterface
      */
     private $router;
+    /**
+     * @var DoctrineHelper
+     */
+    private $doctrineHelper;
 
     /**
      * MultiSafepayMethodFactory constructor.
      * @param MultiSafepayManager $multiSafepayManager '
-     * @param RouterInterface     $router
+     * @param RouterInterface $router
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(MultiSafepayManager $multiSafepayManager, RouterInterface $router)
+    public function __construct(MultiSafepayManager $multiSafepayManager, RouterInterface $router, DoctrineHelper $doctrineHelper)
     {
         $this->multiSafepayManager = $multiSafepayManager;
         $this->router = $router;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
 
@@ -43,6 +50,6 @@ class MultiSafepayMethodFactory implements MultiSafepayMethodFactoryInterface
      */
     public function create(MultiSafepayConfigInterface $config)
     {
-        return new MultiSafepay($config, $this->multiSafepayManager, $this->router);
+        return new MultiSafepay($config, $this->multiSafepayManager, $this->router, $this->doctrineHelper);
     }
 }

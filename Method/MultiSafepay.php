@@ -8,9 +8,12 @@
 
 namespace H1\OroMultiSafepayBundle\Method;
 
+use Oro\Bundle\CustomerBundle\Entity\Customer;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use H1\OroMultiSafepayBundle\Manager\MultiSafepayManager;
 use H1\OroMultiSafepayBundle\Method\Config\MultiSafepayConfigInterface;
 use LogicException;
+use Oro\Bundle\OrderBundle\Entity\Order;
 use Oro\Bundle\PaymentBundle\Context\PaymentContextInterface;
 use Oro\Bundle\PaymentBundle\Entity\PaymentTransaction;
 use Oro\Bundle\PaymentBundle\Method\PaymentMethodInterface;
@@ -94,17 +97,28 @@ class MultiSafepay implements PaymentMethodInterface
      * @var RouterInterface
      */
     private $router;
+    /**
+     * @var DoctrineHelper
+     */
+    private $doctrineHelper;
 
     /**
      * @param MultiSafepayConfigInterface $config
      * @param MultiSafepayManager $multiSafepayManager
      * @param RouterInterface $router
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(MultiSafepayConfigInterface $config, MultiSafepayManager $multiSafepayManager, RouterInterface $router)
+    public function __construct(
+        MultiSafepayConfigInterface $config,
+        MultiSafepayManager $multiSafepayManager,
+        RouterInterface $router,
+        DoctrineHelper $doctrineHelper
+    )
     {
         $this->config = $config;
         $this->multiSafepayManager = $multiSafepayManager;
         $this->router = $router;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -139,6 +153,21 @@ class MultiSafepay implements PaymentMethodInterface
                 'close_window' => 'true',
             ],
         ];
+
+        $entity = $this->doctrineHelper->getEntity(
+            $paymentTransaction->getEntityClass(),
+            $paymentTransaction->getEntityIdentifier()
+        );
+
+        if ($entity instanceof Order) {
+            $description = 'Order';
+            $customer = $entity->getCustomer();
+            if ($customer instanceof Customer) {
+                $description = $customer->getName();
+            }
+            $description .= ' - ' . $entity->getIdentifier();
+            $order['description'] = $description;
+        }
 
         if (array_key_exists('msp_issuer', $additionalData)) {
             $order['gateway_info'] = [

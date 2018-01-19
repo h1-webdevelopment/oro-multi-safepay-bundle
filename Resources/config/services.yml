@@ -57,7 +57,10 @@ services:
   h1_multi_safepay.factory.method.multi_safepay:
      class: H1\OroMultiSafepayBundle\Method\Factory\MultiSafepayMethodFactory
      public: false
-     arguments: ['@h1_multi_safepay.manager', '@router']
+     arguments:
+        - '@h1_multi_safepay.manager'
+        - '@router'
+        - '@oro_entity.doctrine_helper'
 
   h1_multi_safepay.payment_method_provider.multi_safepay:
      class: H1\OroMultiSafepayBundle\Method\Provider\MultiSafepayMethodProvider
