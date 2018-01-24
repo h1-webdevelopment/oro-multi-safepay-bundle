@@ -11,6 +11,7 @@ namespace H1\OroMultiSafepayBundle\Tests\Unit\Method\View;
 use H1\OroMultiSafepayBundle\Method\Config\MultiSafepayConfig;
 use H1\OroMultiSafepayBundle\Method\View\MultiSafepayView;
 use Oro\Bundle\PaymentBundle\Context\PaymentContextInterface;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class MultiSafepayViewTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,8 +24,9 @@ class MultiSafepayViewTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->config = $this->createMock(MultiSafepayConfig::class);
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
 
-        $this->methodView = new MultiSafepayView($this->config);
+        $this->methodView = new MultiSafepayView($this->config, $this->formFactory);
     }
 
     /*public function testGetOptions()

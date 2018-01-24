@@ -5,9 +5,11 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
 namespace H1\OroMultiSafepayBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -44,16 +46,26 @@ class H1OroMultiSafepayBundleInstaller implements Installation
      * Update oro_integration_transport table
      *
      * @param Schema $schema
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     * @throws SchemaException
      */
     protected function updateOroIntegrationTransportTable(Schema $schema)
     {
         $table = $schema->getTable('oro_integration_transport');
-        $table->addColumn('msp_test_mode', 'boolean', ['default' => '0', 'notnull' => false]);
-        $table->addColumn('msp_api_key', 'string', ['default' => '', 'notnull' => false, 'length' => 255]);
-        $table->addColumn('msp_gateway', 'string', ['default' => '', 'notnull' => false, 'length' => 255]);
-        $table->addColumn('msp_issuers', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
-        $table->addColumn('msp_all_issuers', 'json_array', ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
+        if (!$table->hasColumn('msp_test_mode')) {
+            $table->addColumn('msp_test_mode', 'boolean', ['default' => '0', 'notnull' => false]);
+        }
+        if (!$table->hasColumn('msp_api_key')) {
+            $table->addColumn('msp_api_key', 'string', ['default' => '', 'notnull' => false, 'length' => 255]);
+        }
+        if (!$table->hasColumn('msp_gateway')) {
+            $table->addColumn('msp_gateway', 'string', ['default' => '', 'notnull' => false, 'length' => 255]);
+        }
+        if (!$table->hasColumn('msp_issuers')) {
+            $table->addColumn('msp_issuers', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        }
+        if (!$table->hasColumn('msp_all_issuers')) {
+            $table->addColumn('msp_all_issuers', 'json_array', ['notnull' => false, 'comment' => '(DC2Type:json_array)']);
+        }
     }
 
     /**
@@ -63,6 +75,10 @@ class H1OroMultiSafepayBundleInstaller implements Installation
      */
     protected function createH1MultiSafepayShortLabelTable(Schema $schema)
     {
+        if ($schema->hasTable('h1_multi_safepay_short_label')) {
+            return;
+        }
+
         $table = $schema->createTable('h1_multi_safepay_short_label');
         $table->addColumn('transport_id', 'integer', []);
         $table->addColumn('localized_value_id', 'integer', []);
@@ -78,6 +94,10 @@ class H1OroMultiSafepayBundleInstaller implements Installation
      */
     protected function createH1MultiSafepayTransLabelTable(Schema $schema)
     {
+        if ($schema->hasTable('h1_multi_safepay_trans_label')) {
+            return;
+        }
+
         $table = $schema->createTable('h1_multi_safepay_trans_label');
         $table->addColumn('transport_id', 'integer', []);
         $table->addColumn('localized_value_id', 'integer', []);
@@ -90,6 +110,7 @@ class H1OroMultiSafepayBundleInstaller implements Installation
      * Add h1_multi_safepay_short_label foreign keys.
      *
      * @param Schema $schema
+     * @throws SchemaException
      */
     protected function addH1MultiSafepayShortLabelForeignKeys(Schema $schema)
     {
@@ -112,6 +133,7 @@ class H1OroMultiSafepayBundleInstaller implements Installation
      * Add h1_multi_safepay_trans_label foreign keys.
      *
      * @param Schema $schema
+     * @throws SchemaException
      */
     protected function addH1MultiSafepayTransLabelForeignKeys(Schema $schema)
     {
