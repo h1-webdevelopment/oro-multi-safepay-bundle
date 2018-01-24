@@ -12,6 +12,7 @@ use H1\OroMultiSafepayBundle\Method\Config\MultiSafepayConfigInterface;
 use H1\OroMultiSafepayBundle\Method\View\Factory\MultiSafepayViewFactory;
 use H1\OroMultiSafepayBundle\Method\View\Factory\MultiSafepayViewFactoryInterface;
 use H1\OroMultiSafepayBundle\Method\View\MultiSafepayView;
+use Symfony\Component\Form\FormFactoryInterface;
 
 class MultiSafepayPaymentMethodViewFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +23,9 @@ class MultiSafepayPaymentMethodViewFactoryTest extends \PHPUnit_Framework_TestCa
 
     protected function setUp()
     {
-        $this->factory = new MultiSafepayViewFactory();
+        $this->formFactory = $this->createMock(FormFactoryInterface::class);
+
+        $this->factory = new MultiSafepayViewFactory($this->formFactory);
     }
 
     public function testCreate()
@@ -30,7 +33,7 @@ class MultiSafepayPaymentMethodViewFactoryTest extends \PHPUnit_Framework_TestCa
         /** @var MultiSafepayConfigInterface|\PHPUnit_Framework_MockObject_MockObject $config */
         $config = $this->createMock(MultiSafepayConfigInterface::class);
 
-        $method = new MultiSafepayView($config);
+        $method = new MultiSafepayView($config, $this->formFactory);
 
         static::assertEquals($method, $this->factory->create($config));
     }

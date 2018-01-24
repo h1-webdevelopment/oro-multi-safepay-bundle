@@ -10,6 +10,7 @@ namespace H1\OroMultiSafepayBundle\Method\View\Factory;
 use H1\OroMultiSafepayBundle\Method\Config\MultiSafepayConfigInterface;
 use H1\OroMultiSafepayBundle\Method\View\MultiSafepayView;
 use Symfony\Component\Form\FormFactory;
+use Symfony\Component\Form\FormFactoryInterface;
 
 /**
  * Class MultiSafepayViewFactory
@@ -23,9 +24,9 @@ class MultiSafepayViewFactory implements MultiSafepayViewFactoryInterface
 
     /**
      * MultiSafepayViewFactory constructor.
-     * @param FormFactory $formFactory
+     * @param FormFactoryInterface $formFactory
      */
-    public function __construct(FormFactory $formFactory)
+    public function __construct(FormFactoryInterface $formFactory)
     {
         $this->formFactory = $formFactory;
     }

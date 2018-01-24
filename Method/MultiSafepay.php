@@ -194,17 +194,19 @@ class MultiSafepay implements PaymentMethodInterface
      */
     public function complete(PaymentTransaction $paymentTransaction)
     {
+        $transactionid =$paymentTransaction->getResponse()['transactionid'];
+
         $response = $this->multiSafepayManager
             ->configureByConfig($this->config)
             ->getClient()
-            ->getOrder($paymentTransaction->getResponse()['transactionid']);
+            ->getOrder($transactionid);
 
         if ($response->status === 'completed') {
             $paymentTransaction
                 ->setSuccessful(true)
                 ->setActive(false)
                 ->setResponse((array)$response)
-                ->setReference($paymentTransaction->getResponse()['transactionid']);
+                ->setReference($transactionid);
         }
     }
 
@@ -297,7 +299,7 @@ class MultiSafepay implements PaymentMethodInterface
             ),
 
             'notifyUrl' => $this->router->generate(
-                'oro_payment_callback_notify',
+                'h1_oro_multi_savepay_callback_notify',
                 [
                     'accessIdentifier' => $paymentTransaction->getAccessIdentifier(),
                     'accessToken' => $paymentTransaction->getAccessToken()

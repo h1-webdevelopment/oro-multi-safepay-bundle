@@ -50,7 +50,11 @@ class MultiSafepayConfigFactoryTest extends \PHPUnit_Framework_TestCase
         $channelName = 'someChannelName';
         $label = 'someLabel';
         $paymentMethodId = 'paymentMethodId';
-        $issuerId = 'issuerId';
+        $issuers = ['issuerId'];
+        $allIssuers = ['issuerId', 'issuerKey'];
+        $gatewayKey = 'gateway';
+        $apiKey = 'apiKey';
+        $apiUrl = 'apiUrl';
 
         $paymentSettingsMock = $this->createMultiSafepaySettingsMock();
         $channelMock = $this->createChannelMock();
@@ -95,13 +99,42 @@ class MultiSafepayConfigFactoryTest extends \PHPUnit_Framework_TestCase
             ->method('getShortLabels')
             ->willReturn($shortLabelsCollection);
 
+        $paymentSettingsMock
+            ->expects(static::once())
+            ->method('getGateway')
+            ->willReturn($gatewayKey);
+
+        $paymentSettingsMock
+            ->expects(static::once())
+            ->method('getApiKey')
+            ->willReturn($apiKey);
+
+        $paymentSettingsMock
+            ->expects(static::once())
+            ->method('getApiUrl')
+            ->willReturn($apiUrl);
+
+        $paymentSettingsMock
+            ->expects(static::once())
+            ->method('getIssuers')
+            ->willReturn($issuers);
+
+        $paymentSettingsMock
+            ->expects(static::once())
+            ->method('getAllIssuers')
+            ->willReturn($allIssuers);
+
         $expectedSettings = new MultiSafepayConfig(
             [
-                MultiSafepayConfig::ADMIN_LABEL_KEY => $channelName,
                 MultiSafepayConfig::LABEL_KEY => $label,
                 MultiSafepayConfig::SHORT_LABEL_KEY => $label,
+                MultiSafepayConfig::ADMIN_LABEL_KEY => $channelName,
+                MultiSafepayConfig::GATEWAY_KEY => $gatewayKey,
+                MultiSafepayConfig::API_KEY => $apiKey,
+                MultiSafepayConfig::API_URL => $apiUrl,
+                MultiSafepayConfig::ISSUERS_KEY => $issuers,
+                MultiSafepayConfig::ALL_ISSUERS => $allIssuers,
                 MultiSafepayConfig::PAYMENT_METHOD_IDENTIFIER_KEY => $paymentMethodId,
-                MultiSafepayConfig::ISSUER_IDENTIFIER_KEY => $issuerId,
             ]
         );
 
