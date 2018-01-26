@@ -299,7 +299,7 @@ class MultiSafepay implements PaymentMethodInterface
             ),
 
             'notifyUrl' => $this->router->generate(
-                'h1_oro_multi_savepay_callback_notify',
+                'h1_oro_multi_safepay_callback_notify',
                 [
                     'accessIdentifier' => $paymentTransaction->getAccessIdentifier(),
                     'accessToken' => $paymentTransaction->getAccessToken()

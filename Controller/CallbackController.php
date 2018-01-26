@@ -23,7 +23,7 @@ class CallbackController extends Controller
     /**
      * @Route(
      *     "/notify/{accessIdentifier}/{accessToken}",
-     *     name="h1_oro_multi_savepay_callback_notify",
+     *     name="h1_oro_multi_safepay_callback_notify",
      *     requirements={"accessIdentifier"="[a-zA-Z0-9\-]+", "accessToken"="[a-zA-Z0-9\-]+"}
      * )
      * @ParamConverter(
@@ -41,7 +41,7 @@ class CallbackController extends Controller
          * #todo, this controller should be obselete
          *
          * When oro fixes the callback url remove this controller.
-         * And change the callback url in the multiSavepay request.
+         * And change the callback url in the multiSafepay request.
          */
 
         $url = $this->get('router')->generate('oro_payment_callback_notify', [

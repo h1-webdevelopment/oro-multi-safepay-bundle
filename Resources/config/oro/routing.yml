@@ -1,6 +1,6 @@
-h1_oro_multi_savepay_callback:
+h1_oro_multi_safepay_callback:
     resource:     "@H1OroMultiSafepayBundle/Controller/CallbackController.php"
     type:         annotation
-    prefix:       /multi-savepay/callback
+    prefix:       /multi-safepay/callback
     options:
         frontend: true

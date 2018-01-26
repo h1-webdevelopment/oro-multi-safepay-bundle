@@ -65,16 +65,16 @@ class MultiSafepayNotifyListener
             return;
         }
 
-        /** @var MultiSafepay $multiSavepay */
-        $multiSavepay = $this->paymentMethodProvider->getPaymentMethod($paymentTransaction->getPaymentMethod());
-        $multiSavepayOrder = $multiSavepay->execute('updateOrderStatus', $paymentTransaction);
+        /** @var MultiSafepay $multiSafepay */
+        $multiSafepay = $this->paymentMethodProvider->getPaymentMethod($paymentTransaction->getPaymentMethod());
+        $multiSafepayOrder = $multiSafepay->execute('updateOrderStatus', $paymentTransaction);
         $event->markSuccessful();
 
-        if (array_key_exists('status', $multiSavepayOrder)) {
+        if (array_key_exists('status', $multiSafepayOrder)) {
             $this->logger->addInfo(
                 sprintf('Payment notified, payment transaction id %s, status %s',
                     $paymentTransaction->getId(),
-                    $multiSavepayOrder['status']
+                    $multiSafepayOrder['status']
                 ));
         } else {
             $this->logger->addInfo('Payment successfully marked completed');
