@@ -25,7 +25,6 @@ class CustomerDataDecorator extends AbstractOrderDataDecorator
         /** @var CustomerUser $customer */
         $customer = $this->paymentTransaction->getFrontendOwner();
 
-//        dump(iterator_to_array($customer->getAddresses())); exit;
         $customerData = [
             'first_name' => $customer->getFirstName(),
             'last_name' => $customer->getLastName(),

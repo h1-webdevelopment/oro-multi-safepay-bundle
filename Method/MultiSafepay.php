@@ -175,10 +175,19 @@ class MultiSafepay implements PaymentMethodInterface
             ];
         }
 
+
         /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-        $res = $this->multiSafepayManager->configureByConfig($this->config)
-            ->getClient()
-            ->postOrders($order);
+        try {
+            $res = $this->multiSafepayManager->configureByConfig($this->config)
+                ->getClient()
+                ->postOrders($order);
+        } catch (\Exception $e) {
+            return [
+                'message' => $e->getMessage(),
+                'success' => false,
+            ];
+        }
+
 
         return [
             // @codingStandardsIgnoreLine Zend.NamingConventions.ValidVariableName.NotCamelCaps
@@ -194,20 +203,17 @@ class MultiSafepay implements PaymentMethodInterface
      */
     public function complete(PaymentTransaction $paymentTransaction)
     {
-        $transactionid =$paymentTransaction->getResponse()['transactionid'];
+        $transactionid = $paymentTransaction->getResponse()['transactionid'];
 
         $response = $this->multiSafepayManager
             ->configureByConfig($this->config)
             ->getClient()
             ->getOrder($transactionid);
 
-        if ($response->status === 'completed') {
-            $paymentTransaction
-                ->setSuccessful(true)
-                ->setActive(false)
-                ->setResponse((array)$response)
-                ->setReference($transactionid);
-        }
+        $paymentTransaction->setResponse((array)$response);
+        $paymentTransaction->setReference($transactionid);
+
+        $this->updatePaymentStatus($paymentTransaction, $response->status);
     }
 
     /**
@@ -222,21 +228,41 @@ class MultiSafepay implements PaymentMethodInterface
             ->getClient()
             ->getOrder($paymentTransaction->getAccessIdentifier());
 
-        if ($response->status === 'completed') {
-            $paymentTransaction
-                ->setSuccessful(true)
-                ->setActive(false)
-                ->setResponse((array)$response);
-//        } else {
-//            #todo what if an order is payed and later an order is declined or something. Do we change the status of the payment again?
-//            $paymentTransaction
-//                ->setSuccessful(true)
-//                ->setActive(false)
-//                ->setResponse((array)$response);
-        }
-
+        $paymentTransaction->setResponse((array)$response);
+        $this->updatePaymentStatus($paymentTransaction, $response->status);
 
         return (array)$response;
+    }
+
+
+    public function updatePaymentStatus(PaymentTransaction $paymentTransaction, string $status)
+    {
+        switch ($status) {
+            case 'completed':
+                $paymentTransaction->setSuccessful(true);
+                $paymentTransaction->setActive(false);
+                $paymentTransaction->setAction(PaymentMethodInterface::PURCHASE);
+                break;
+            case 'initialized':
+            case 'uncleared':
+            case 'reserved':
+                $paymentTransaction->setSuccessful(false);
+                $paymentTransaction->setActive(true);
+                $paymentTransaction->setAction(PaymentMethodInterface::VALIDATE);
+                break;
+            case 'declined':
+            case 'canceled':
+            case 'expired':
+            case 'refunded':
+            case 'partial_refunded':
+            case 'void':
+            case 'chargedback':
+                if ($paymentTransaction->isActive()) {
+                    $paymentTransaction->setSuccessful(false);
+                    $paymentTransaction->setActive(false);
+                }
+                break;
+        }
     }
 
     /**

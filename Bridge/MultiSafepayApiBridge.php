@@ -5,6 +5,7 @@
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
+
 namespace H1\OroMultiSafepayBundle\Bridge;
 
 /**
@@ -67,14 +68,7 @@ class MultiSafepayApiBridge implements MultiSafepayApiClientBridgeInterface
      */
     public function postOrders(array $orders)
     {
-        try {
-            $result = $this->client->orders->post($orders);
-        } catch (\Exception $e) {
-            dump($e);
-            exit;
-        }
-
-        return $result;
+        return $this->client->orders->post($orders);
     }
 
     /**
@@ -82,13 +76,6 @@ class MultiSafepayApiBridge implements MultiSafepayApiClientBridgeInterface
      */
     public function getOrder(string $transactionId)
     {
-        try {
-            $result = $this->client->orders->get('orders', $transactionId);
-        } catch (\Exception $e) {
-            dump($e);
-            exit;
-        }
-
-        return $result;
+        return $this->client->orders->get('orders', $transactionId);
     }
 }
